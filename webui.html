@@ -1,5 +1,5 @@
 <html>
- 
+
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
@@ -11,22 +11,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
 </head>
- 
+
 <body>
     <div id="dropzone" style="display:none;">
         <form action="/upload" class="dropzone" id="mydz" />
     </div>
- 
+
     <style>
         .disabledbutton {
             pointer-events: none;
             opacity: 0.4;
         }
- 
+        
         #rawgCode {
             margin-bottom: 10px;
         }
- 
+        
         #eStop {
             display: block;
             margin: 30px auto;
@@ -34,14 +34,14 @@
             /* Chrome, Safari, Opera */
             filter: grayscale(70%);
         }
- 
+        
         #eStop:hover {
             cursor: pointer;
             -webkit-filter: grayscale(0%);
             /* Chrome, Safari, Opera */
             filter: grayscale(0%);
         }
- 
+        
         .topBar {
             background: rgb(255, 255, 255);
             /* Old browsers */
@@ -56,7 +56,7 @@
             border: 1px solid #c5c5c5;
             margin-bottom: 10px;
         }
- 
+        
         #controls {
             /*
    -webkit-filter: grayscale(100%);
@@ -64,11 +64,11 @@
    pointer-events:none;
 */
         }
- 
+        
         .homeIt {
             margin-bottom: 4px;
         }
- 
+        
         .jogdial {
             min-width: 30px;
             min-height: 26px;
@@ -77,17 +77,17 @@
             margin-bottom: 1px;
             font-size: 10px;
         }
- 
+        
         .jogitem {
             text-align: center;
         }
- 
+        
         .controlBox {
             border: 2px solid #b3b3b3;
             padding: 0px 0px 10px 0px;
             margin-bottom: 10px;
         }
- 
+        
         #movement {
             background: #d9edf7;
             font-size: 20px;
@@ -96,26 +96,26 @@
             margin-bottom: 10px;
             border-bottom: 2px solid #b3b3b3;
         }
- 
+        
         #mainPage {
             margin-top: 10px;
         }
- 
+        
         .unkPos {
             color: #ff0000;
         }
- 
+        
         .dropzone {
             min-height: 40px;
             padding: 0px;
             background: #e6f9ff;
             border-radius: 10px;
         }
- 
+        
         .dropzone .dz-message {
             margin: 1em;
         }
- 
+        
         #gCodeLog {
             min-height: 104px;
             max-height: 104px;
@@ -127,31 +127,29 @@
             color: #000000;
             font-size: 10px;
         }
- 
+        
         span.ui-slider-handle.ui-corner-all.ui-state-default {
             background: #337ab7;
         }
- 
+        
         #fanSlider {
             background: #e6f9ff;
         }
     </style>
- 
+
     <div id="mainPage" class="container-fluid">
         <div class="row">
             <div class="col-xs-12">
                 <div class="hero-unit topBar">
- 
+
                     <div class="col-xs-12 col-md-4"></div>
                     <div class="col-xs-12 col-md-4">
-                        <h1 style="text-align: center;">Malyan Desktop 3D Printer</h1>
- 
                         <div style="text-align: center; max-width: 400px; margin:30px auto;">
                             <strong>Print Status: <span id="stat">N/A</span></strong>
                             <div class="progress" style="margin-bottom: 10px; height: 30px;border: 1px solid #b3b3b3;">
                                 <div class="progress-bar progress-bar-striped active" role="progressbar" id="pgs" style="padding-top: 4px;"></div>
                             </div>
- 
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <button class="btn btn-success btn-block" type="button" onclick="start_p()"><i class="fa fa-check"></i> Start Print</button>
@@ -162,25 +160,25 @@
                             </div>
                             <div class="clearfix"></div>
                             <div id="newDropzone" style="margin-top: 10px;"></div>
- 
+
                         </div>
- 
+
                     </div>
                     <div class="col-xs-12 col-md-4" style="text-align: center;"><img src="http://mpselectmini.com/mpselect/webui/estop.png" id="eStop" class=""></div>
                     <div class="clearfix"></div>
                 </div>
- 
+
                 <div class="row" id="controls" disabled>
                     <div class="col-md-6">
                         <div id="gCodeLog" class=""></div>
                         <div id="rawgCode" class="input-group">
                             <input class="form-control" type="text" name="gcode" id="gcode" placeholder="Send gCode to printer..."><span class="input-group-btn"><button id="sendRAWgCode" class="btn btn-warning"><i class="fa fa-send" aria-hidden="true"></i> Send</button></span>
                         </div>
- 
+
                         <div class="col-xs-12 controlBox">
                             <div class="col-xs-12" id="movement">Movement</div>
                             <div class="col-xs-8">
- 
+
                                 <div class="col-xs-4 jogitem">
                                     <button class="btn btn-danger homeIt" data-axis="X" data-id="X0"><i class="fa fa-home"></i> X</button>
                                     <br>
@@ -206,7 +204,7 @@
                                     <input id="posY" type="text" disabled value="0" placeholder="?" class="unkPos" style="width: 48px;">
                                 </div>
                                 <div class="clearfix"></div>
- 
+
                                 <div class="col-xs-12 jogitem">
                                     <button class="btn btn-info jogdial moveIt" data-speed="F2400" data-axis="X" data-id="-50"><i class="fa fa-chevron-left"></i> 50</button>
                                     <button class="btn btn-info jogdial moveIt" data-speed="F2400" data-axis="X" data-id="-10"><i class="fa fa-chevron-left"></i> 10</button>
@@ -219,7 +217,7 @@
                                     <button class="btn btn-info jogdial moveIt" data-speed="F2400" data-axis="X" data-id="50"><i class="fa fa-chevron-right"></i> 50</button>
                                 </div>
                                 <div class="clearfix"></div>
- 
+
                                 <div class="col-xs-4 jogitem" style="min-height: 108px;">
                                     <button class="btn btn-info homeIt" data-axis="XYZ" data-id="X0 Y0 Z0" style="position: absolute; bottom: 0; left: 40px;"><i class="fa fa-home"></i> All</button>
                                 </div>
@@ -243,7 +241,7 @@
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
- 
+
                             <div class="col-xs-2 jogitem">
                                 <button class="btn btn-primary jogdial moveIt" data-speed="F2400" data-axis="Z" data-id="50"><i class="fa fa-chevron-up"></i>
                                     <br>50</button>
@@ -272,7 +270,7 @@
                                     <br>50</button>
                                 <br>
                             </div>
- 
+
                             <div class="col-xs-2 jogitem">
                                 <button class="btn btn-warning jogdial moveIt" data-axis="E" data-speed="F250" data-id="-100"><i class="fa fa-chevron-up"></i>
                                     <br>-100</button>
@@ -303,10 +301,10 @@
                             </div>
                         </div>
                         <div class="clearfix"></div>
- 
+
                     </div>
                     <div class="col-md-6">
- 
+
                         <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
                             <div class="col-xs-4"><strong>Fan Speed: <span id="fanAmount"style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">Off</span></strong></div>
                             <div class="col-xs-8">
@@ -314,7 +312,7 @@
                             </div>
                         </div>
                         <div class="clearfix"></div>
- 
+
                         <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
                             <strong>Extruder</strong> Temp: <strong><span id="rde" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdeTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
                         </div>
@@ -329,9 +327,9 @@
                       </span>
                         </div>
                         <div class="clearfix"></div>
- 
+
                         <hr>
- 
+
                         <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
                             <strong>Build Platform</strong> Temp: <strong><span id="rdp" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdpTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
                         </div>
@@ -346,7 +344,7 @@
                       </span>
                         </div>
                         <div class="clearfix"></div>
- 
+
                     </div>
                     <div class="col-md-4"></div>
                 </div>
@@ -357,79 +355,120 @@
         $tooQuick = false;
         $extruderTemp = '0';
         $bedTemp = '0';
- 
+
         function pad(num, size) {
             var s = "000" + num;
             return s.substr(s.length - size);
         }
+
+        function enableControls(enabled) {
+            if (enabled) {
+                $("#newDropzone").removeClass('disabledbutton');
+                $(".controlBox").removeClass('disabledbutton');
+                $("#rawgCode").removeClass('disabledbutton');
+            } else {
+                $("#newDropzone").addClass('disabledbutton');
+                $(".controlBox").addClass('disabledbutton');
+                $("#rawgCode").addClass('disabledbutton');
+            }
+        }
+
+        function updatePrintingStats(percentComplete) {
+            if (percentComplete < 0) {
+                $("#stat").text("Idle");
+                $("#pgs").css("width", "0%");
+            } else {
+                $("#stat").text("Printing");
+                $("#pgs").css("width", percentComplete + "%");
+                $("#pgs").html(percentComplete + "%");
+            }
+        }
+        
+        function sendCommand(cmd) {
+            $.ajax({
+                url: "set?cmd=" + cmd,
+                cache: false
+            }).done(function(html) {
+                $('#gCodeLog').append("<br><b>CMD:</b> " + cmd);
+                gCodeLog.scrollTop = gCodeLog.scrollHeight;
+            });
+        }
+
+        function sendCode(code, completionCallback, completionCallbackCompleted) {
+            $.ajax({
+                url: "set?code=" + code,
+                cache: false
+            }).done(function(html) {
+                if (completionCallback) {
+                    completionCallback();
+                }
+                
+                $('#gCodeLog').append("<br>" + code);
+                gCodeLog.scrollTop = gCodeLog.scrollHeight;
+                
+                if (completionCallbackCompleted) {
+                    completionCallbackCompleted();
+                }
+            });
+        }
+
+        function updateState() {
+            $.get("inquiry", function(data, status) {
+                console.log(data);
+                
+                $extruderTemp = data.match(/\d+/g)[0];
+                $extruderTarget = data.match(/\d+/g)[1];
+                $bedTemp = data.match(/\d+/g)[2];
+                $bedTarget = data.match(/\d+/g)[3];
+
+                $("#rde").text($extruderTemp);
+                $("#rdeTarget").text($extruderTarget);
+                $("#rdp").text($bedTemp);
+                $("#rdpTarget").text($bedTarget);
+                
+                var c = data.charAt(data.length - 1);
+                if (c == 'I') {
+                    updatePrintingStats(-1);
+                    enableControls(true)
+                } else if (c == 'P') {
+                    enableControls(false);
+                    var percentComplete = data.match(/\d+/g)[4];
+                    updatePrintingStats(percentComplete);
+                } else {
+                    $("#stat").text(" ");
+                }
+            });
+        }
+
         $(document).ready(function() {
             var gCodeLog = document.getElementById("gCodeLog");
-            $("#newDropzone").addClass('disabledbutton');
-            $(".controlBox").addClass('disabledbutton');
-            $("#rawgCode").addClass('disabledbutton');
- 
-            setInterval(function() {
-                $.get("inquiry", function(data, status) {
-                    console.log(data);
-                    //                $('#gCodeLog').append('<br>'+data);
-                    $("#rde").text(data.match(/\d+/g)[0]);
-                    //$("#rdeTarget").text(data.match(/\d+/g)[1]);
-                    var exTgt = data.match(/\d+/g)[1];
-                    if (exTgt > 30 || exTgt == 0) $("#rdeTarget").text(exTgt);
-                    $("#rdp").text(data.match(/\d+/g)[2]);
-                    $("#rdpTarget").text(data.match(/\d+/g)[3]);
-                    $extruderTemp = data.match(/\d+/g)[0];
-                    $extruderTarget = data.match(/\d+/g)[1];
-                    $bedTemp = data.match(/\d+/g)[2];
-                    $bedTarget = data.match(/\d+/g)[3];
-                    var c = data.charAt(data.length - 1);
-                    if (c == 'I') {
-                        $("#stat").text("Idle");
-                        $("#pgs").css("width", "0%");
-                        $("#newDropzone").removeClass('disabledbutton');
-                        $(".controlBox").removeClass('disabledbutton');
-                        $("#rawgCode").removeClass('disabledbutton');
-                    } else if (c == 'P') {
-                        $("#newDropzone").addClass('disabledbutton');
-                        $(".controlBox").addClass('disabledbutton');
-                        $("#rawgCode").addClass('disabledbutton');
-                        $("#stat").text("Printing");
-                        $("#pgs").css("width", data.match(/\d+/g)[4] + "%");
-                        $("#pgs").html(data.match(/\d+/g)[4] + "%");
-                    } else $("#stat").text(" ");
-                });
-            }, 5000);
+            enableControls(false);
+
+            updateState();
+            setInterval(updateState, 5000);
+
             $("#sete").click(function() {
                 var value = pad($("#wre").val(), 3);
-                $.ajax({
-                    url: 'set?cmd={C:T0' + value + '}',
-                    cache: false
-                }).done(function(html) {});
+                sendCommand('{C:T0' + value + '}');
             });
+
             $("#clre").click(function() {
-                $.ajax({
-                    url: "set?cmd={C:T0000}",
-                    cache: false
-                }).done(function(html) {});
+                sendCommand("{C:T0000}");
             });
+
             $("#setp").click(function() {
                 var value = pad($("#wrp").val(), 3);
-                $.ajax({
-                    url: 'set?cmd={C:P' + value + '}',
-                    cache: false
-                }).done(function(html) {});
+                sendCommand('{C:P' + value + '}');
             });
+
             $("#clrp").click(function() {
-                $.ajax({
-                    url: "set?cmd={C:P000}",
-                    cache: false
-                }).done(function(html) {});
+                sendCommand("{C:P000}");
             });
         });
         String.prototype.contains = function(it) {
             return this.indexOf(it) != -1;
         };
- 
+
         Dropzone.options.mydz = {
             dictDefaultMessage: "Upload GCode here",
             accept: function(file, done) {
@@ -448,70 +487,41 @@
                 });
             }
         };
- 
+
         function start_p() {
-            $.ajax({
-                url: "set?code=M565",
-                cache: false
-            }).done(function(html) {});
+            sendCode("M565");
         }
- 
+
         function cancel_p() {
-            $.ajax({
-                url: "set?cmd={P:X}",
-                cache: false
-            }).done(function(html) {});
+            sendCommand('{P:X}');
         }
- 
+
         $('#sendRAWgCode').click(function() {
             var gCode2Send = $('#gcode').val();
             if (gCode2Send == '') {
                 alert("You didn't enter anything!");
                 return;
             }
-            $.ajax({
-                url: "set?code=" + gCode2Send,
-                cache: false
-            }).done(function(html) {
+
+            sendCode(gCode2Send, function() {
                 $('#gcode').val('');
-                $('#gCodeLog').append("<br>" + gCode2Send);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
-                //            alert('sent!');
-            });
+            }, null);
         });
- 
+
         $('#eStop').click(function() {
-            $.ajax({
-                url: "set?code=M112\nM999",
-                cache: false
-            }).done(function(html) {
-                $('#gCodeLog').append("<br>M112; Emergency Stop!");
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
+            sendCode("M112\nM999"), null, function () {
                 alert('Emergency Stop Sent! You will have to cycle power on the printer to get communications back up.');
-            });
- 
+            }
         });
- 
+
         function setFan($fSpeed) {
-            $.ajax({
-                url: "set?code=M106 S" + $fSpeed,
-                cache: false
-            }).done(function(html) {
-                $('#gCodeLog').append("<br>M106 S" + $fSpeed);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
-            });
- 
+            sendCode("M106 S" + $fSpeed);
         }
- 
+
         $('.homeIt').click(function() {
             var doWhat = $(this).data('id');
             var whatAxis = $(this).data('axis');
-            $.ajax({
-                url: "set?code=G28 " + doWhat,
-                cache: false
-            }).done(function(html) {
-                $('#gCodeLog').append("<br>G28 " + doWhat);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
+            sendCode("G28 " + doWhat, null, function() {
                 if (whatAxis == 'XYZ') {
                     $('#posX, #posY, #posZ').val('0');
                     $('#posX, #posY, #posZ').removeClass('unkPos');
@@ -539,19 +549,20 @@
                     }
                 }
             });
+
         });
- 
+
         $axisX = '0';
         $axisY = '0';
         $axisZ = '0';
- 
+
         function atMax() {
             $('#movement').html('<span style="color: #ff0000;">MAX Movement!</span>');
             setTimeout(function() {
                 $('#movement').html('Movement');
             }, 500);
         }
- 
+
         $('.moveIt').click(function() {
             if ($tooQuick == true) {
                 $('#movement').html('<span style="color: #ff0000;">SLOW DOWN!</span>');
@@ -565,7 +576,7 @@
             var doWhere = $(this).data('axis');
             var axisVal = $('#pos' + doWhere).val()
             axisVal = +doWhat + +axisVal;
- 
+
             switch (doWhere) {
                 case 'X':
                     $axisX = +$axisX + +doWhat;
@@ -593,33 +604,26 @@
                     break;
                 default:
             }
- 
+
             $tooQuick = true;
-            $.ajax({
-                url: "set?code=G91",
-                cache: false
-            }).done(function(html) {});
-            $.ajax({
-                url: "set?code=G1 " + doSpeed + ' ' + doWhere + doWhat,
-                cache: false
-            }).done(function(html) {
+            sendCode("G91");
+            sendCode("G1 " + doSpeed + ' ' + doWhere + doWhat, function () {
                 $('#pos' + doWhere).val(axisVal);
                 $tooQuick = false;
-                $('#gCodeLog').append("<br>G90, G1 " + doSpeed + ' ' + doWhere + doWhat);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
-            });
+            }, null);
         });
+
         $(document).ready(function() {
             $("#dropzone").appendTo("#newDropzone").show();
             $("#tempChart").appendTo("#newTempChart").show();
         });
- 
+
         $(document).ready(function() {
             $(function() {
                 var data = [];
                 var data2 = [];
                 var totalPoints = 300;
- 
+
                 function getData() {
                     data = data.slice(1);
                     while (data.length < totalPoints) {
@@ -633,7 +637,7 @@
                     }
                     return res;
                 }
- 
+
                 function getData2() {
                     data2 = data2.slice(1);
                     while (data2.length < totalPoints) {
@@ -647,7 +651,7 @@
                     }
                     return res2;
                 }
- 
+
                 // Set up the control widget
                 var updateInterval = 500;
                 var plot = $.plot("#tempChart", [getData()], {
@@ -658,22 +662,18 @@
                     yaxis: {
                         min: 0,
                         max: 300,
-                        zoomRange: [0.5, 310],
-                        panRange: [0, 300]
                     },
                     xaxis: {
-                        show: false,
-                        zoomRange: [0.5, 310],
-                        panRange: [0, 300]
+                        show: false
                     },
                     zoom: {
-                        interactive: true
+                        interactive: false
                     },
                     pan: {
                         interactive: true
                     }
                 });
- 
+
                 var plot2 = $.plot("#tempChart2", [getData2()], {
                     series: {
                         shadowSize: 0 // Drawing is faster without shadows
@@ -682,26 +682,22 @@
                     yaxis: {
                         min: 0,
                         max: 120,
-                        zoomRange: [0.5, 310],
-                        panRange: [0, 300]
                     },
                     xaxis: {
-                        show: false,
-                        zoomRange: [0.5, 310],
-                        panRange: [0, 300]
+                        show: false
                     },
                     zoom: {
-                        interactive: true
+                        interactive: false
                     },
                     pan: {
                         interactive: true
                     }
- 
+
                 });
- 
+
                 var tempChart = $("#tempChart");
                 var tempChart2 = $("#tempChart2");
- 
+
                 // add zoom out button 
                 $("<div class=\"btn btn-default\" style=\"display: block; width: 40px; float: right; position: relative; top: 10px; right: 10px;\"><i class=\"fa fa-search-minus\"></i></div>").appendTo(tempChart).click(function(event) {
                     event.preventDefault();
@@ -711,7 +707,7 @@
                     event.preventDefault();
                     plot2.zoomOut();
                 });
- 
+
                 function update() {
                     plot.setData([getData()]);
                     plot2.setData([getData2()]);
@@ -720,12 +716,12 @@
                     plot2.draw();
                     setTimeout(update, updateInterval);
                 }
- 
+
                 update();
             });
- 
+
         });
- 
+
         $(function() {
             $("#fanSlider").slider({
                 value: 0,
@@ -748,5 +744,5 @@
         });
     </script>
 </body>
- 
+
 </html>
