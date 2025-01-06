@@ -1,3 +1,4 @@
+
 <html>
 
 <head>
@@ -58,7 +59,7 @@
         }
         
         #controls {
-            /*
+/*
    -webkit-filter: grayscale(100%);
    filter: grayscale(100%);
    pointer-events:none;
@@ -165,14 +166,14 @@
 
                     </div>
                     <div class="col-xs-12 col-md-4" style="text-align: center;"><img src="http://mpselectmini.com/mpselect/webui/estop.png" id="eStop" class=""></div>
-                    <div class="clearfix"></div>
+                    <div class="clearfix">v1.0.0.2</div>
                 </div>
 
                 <div class="row" id="controls" disabled>
                     <div class="col-md-6">
                         <div id="gCodeLog" class=""></div>
                         <div id="rawgCode" class="input-group">
-                            <input class="form-control" type="text" name="gcode" id="gcode" placeholder="Send gCode to printer..."><span class="input-group-btn"><button id="sendRAWgCode" class="btn btn-warning"><i class="fa fa-send" aria-hidden="true"></i> Send</button></span>
+                            <input class="form-control" type="text" name="gcode" id="gcode" placeholder="Send gCode to printer... (M563 S5)"><span class="input-group-btn"><button id="sendRAWgCode" class="btn btn-warning"><i class="fa fa-send" aria-hidden="true"></i> Send</button></span>
                         </div>
 
                         <div class="col-xs-12 controlBox">
@@ -352,6 +353,10 @@
         </div>
     </div>
     <script>
+        $lastStateFetch = null;
+        $forceStateState = false;
+        $uploadInProgress = false;
+
         $tooQuick = false;
         $extruderTemp = '0';
         $bedTemp = '0';
@@ -384,13 +389,27 @@
             }
         }
         
+        function displayConsole(text) {
+            $('#gCodeLog').append("<br>" + text);
+            gCodeLog.scrollTop = gCodeLog.scrollHeight;
+        }
+
+        function invalidateState() {
+            setTimeout(function() {
+                $forceStateState = true;
+            }, 500)
+        }
+
         function sendCommand(cmd) {
             $.ajax({
                 url: "set?cmd=" + cmd,
                 cache: false
-            }).done(function(html) {
-                $('#gCodeLog').append("<br><b>CMD:</b> " + cmd);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
+            }).done(function(httpStatus) {
+                invalidateState();
+                displayConsole("<b>CMD:</b> " + cmd);
+                if (httpStatus != 'OK') {
+                    displayConsole(" - - - > RESULT:" + httpStatus);
+                }
             });
         }
 
@@ -398,14 +417,18 @@
             $.ajax({
                 url: "set?code=" + code,
                 cache: false
-            }).done(function(html) {
+            }).done(function(httpStatus) {
+                invalidateState();
+
                 if (completionCallback) {
                     completionCallback();
                 }
-                
-                $('#gCodeLog').append("<br>" + code);
-                gCodeLog.scrollTop = gCodeLog.scrollHeight;
-                
+
+                displayConsole(code);
+                if (httpStatus != 'OK') {
+                    displayConsole(" - - - > RESULT:" + httpStatus);
+                }
+
                 if (completionCallbackCompleted) {
                     completionCallbackCompleted();
                 }
@@ -413,31 +436,39 @@
         }
 
         function updateState() {
-            $.get("inquiry", function(data, status) {
-                console.log(data);
-                
-                $extruderTemp = data.match(/\d+/g)[0];
-                $extruderTarget = data.match(/\d+/g)[1];
-                $bedTemp = data.match(/\d+/g)[2];
-                $bedTarget = data.match(/\d+/g)[3];
+            var current = new Date().getTime();
+            var invalidState = $forceStateState || !$lastStateFetch || (current - $lastStateFetch >= 5000);
+            if (invalidState && !$uploadInProgress) {
+                $forceStateState = false;
+                $lastStateFetch = current;
 
-                $("#rde").text($extruderTemp);
-                $("#rdeTarget").text($extruderTarget);
-                $("#rdp").text($bedTemp);
-                $("#rdpTarget").text($bedTarget);
-                
-                var c = data.charAt(data.length - 1);
-                if (c == 'I') {
-                    updatePrintingStats(-1);
-                    enableControls(true)
-                } else if (c == 'P') {
-                    enableControls(false);
-                    var percentComplete = data.match(/\d+/g)[4];
-                    updatePrintingStats(percentComplete);
-                } else {
-                    $("#stat").text(" ");
-                }
-            });
+                // fetch state from the printer.
+                $.get("inquiry", function(data, status) {
+                    console.log(data);
+                    
+                    $extruderTemp = data.match(/\d+/g)[0];
+                    $extruderTarget = data.match(/\d+/g)[1];
+                    $bedTemp = data.match(/\d+/g)[2];
+                    $bedTarget = data.match(/\d+/g)[3];
+
+                    $("#rde").text($extruderTemp);
+                    $("#rdeTarget").text($extruderTarget);
+                    $("#rdp").text($bedTemp);
+                    $("#rdpTarget").text($bedTarget);
+                    
+                    var c = data.charAt(data.length - 1);
+                    if (c == 'I') {
+                        updatePrintingStats(-1);
+                        enableControls(true)
+                    } else if (c == 'P') {
+                        enableControls(false);
+                        var percentComplete = data.match(/\d+/g)[4];
+                        updatePrintingStats(percentComplete);
+                    } else {
+                        $("#stat").text(" ");
+                    }
+                });
+            }
         }
 
         $(document).ready(function() {
@@ -445,7 +476,7 @@
             enableControls(false);
 
             updateState();
-            setInterval(updateState, 5000);
+            setInterval(updateState, 1000);
 
             $("#sete").click(function() {
                 var value = pad($("#wre").val(), 3);
@@ -472,18 +503,33 @@
         Dropzone.options.mydz = {
             dictDefaultMessage: "Upload GCode here",
             accept: function(file, done) {
-                if (file.name.contains(".g")) done();
-                else done("Not a valid GCode file.");
+                console.log("mydz.accept");
+                if (file.name.contains(".g")) {
+                    done();
+                } else {
+                    done("Not a valid GCode file.");
+                } 
             },
             init: function() {
                 this.on('error', function(file, response) {
+                    console.log("mydz.error");
                     var errorMessage = response.errorMessage;
                     $(file.previewElement).find('.dz-error-message').text(errorMessage);
                 });
                 this.on("addedfile", function() {
+                    console.log("mydz.addedfile");
                     if (this.files[1] != null) {
                         this.removeFile(this.files[0]);
                     }
+                });
+                this.on("complete", function() {
+                    $uploadInProgress = false;
+                    console.log("mydz.complete");
+                });
+                this.on('sending', function(file, xhr, formData) {
+                    $uploadnProgress = true;
+                    console.log("mydz.sending");
+                    displayConsole("Upload Complete")
                 });
             }
         };
