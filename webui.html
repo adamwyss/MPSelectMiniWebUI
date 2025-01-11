@@ -114,9 +114,21 @@
             background: #337ab7;
         }
         
-        #fanSlider {
+        .sliderTrack {
+            margin-top: 15px;
             background: #e6f9ff;
         }
+
+        #extruderHandle, #bedHandle, #fanHandle {
+            width: 3em;
+            height: 1.6em;
+            background: #337ab7;
+            color: white;
+            margin-top: -.8em;
+            text-align: center;
+            line-height: 1.6em;
+        }
+
     </style>
 
     <div id="mainPage" class="container-fluid">
@@ -174,20 +186,28 @@
                         </div>
 
                             <div class="col-xs-4 controlSection">
-                                <div class="col-xs-12 controlSectionHeader" style="margin-top: 10px;">Temperature Control</div>
-                                <div class="col-xs-12">
-                                    <div class="col-xs-4"></div>
-                                    <div class="col-xs-4"></div>
-                                    <div class="col-xs-4 text-center" style="align-content: center">
+                                <div class="col-xs-12 controlSectionHeader" style="margin-top: 10px;">Temperature</div>
+                                <div class="row">
+                                    <div class="col-xs-4">
 
-                                        <div style="margin-bottom:10;"><strong>Fan</strong></div>
-                                        <div id="fanSlider" style="margin-left: 17px; margin-bottom: 15px;"></div>
-                                        <div><strong><span id="fanAmount"style="border: 2px solid #b3b3b3; padding: 6px; border-radius: 2px;">Off</span></strong></div>
+                                        <div><strong>Extruder</strong></div>
+                                        <div id="extruderSlider" class="sliderTrack"><div id="extruderHandle" class="ui-slider-handle"></div></div>
                                         
-                    </div>
-                    </div>
+                                    </div>
+                                    <div class="col-xs-4">
+                                        
+                                        <div><strong>Bed</strong></div>
+                                        <div id="bedSlider" class="center sliderTrack"><div id="bedHandle" class="ui-slider-handle"></div></div>
 
-                </div>
+                                    </div>
+                                    <div class="col-xs-4">
+
+                                        <div><strong>Fan</strong></div>
+                                        <div id="fanSlider" class="sliderTrack"><div id="fanHandle" class="ui-slider-handle"></div></div>
+                                    </div>
+                                </div>
+
+                            </div>
                             <div class="clearfix"></div>
                         </div>
 
@@ -481,6 +501,9 @@
                     $("#rdeTarget").text($extruderTarget);
                     $("#rdp").text($bedTemp);
                     $("#rdpTarget").text($bedTarget);
+
+                    updateExtruderSliderValue($extruderTarget);
+                    updateBedSliderValue($bedTarget);
                     
                     var c = data.charAt(data.length - 1);
                     if (c == 'I') {
@@ -533,21 +556,19 @@
             });
 
             $("#sete").click(function() {
-                var value = pad($("#wre").val(), 3);
-                sendCommand('{C:T0' + value + '}');
+                setExtruderTarget($("#wre").val());
             });
 
             $("#clre").click(function() {
-                sendCommand("{C:T0000}");
+                setExtruderTarget(0);
             });
 
             $("#setp").click(function() {
-                var value = pad($("#wrp").val(), 3);
-                sendCommand('{C:P' + value + '}');
+                setBedTarget($("#wrp").val());
             });
 
             $("#clrp").click(function() {
-                sendCommand("{C:P000}");
+                setBedTarget(0);
             });
         });
 
@@ -596,8 +617,30 @@
             }
         };
 
-        function setFan($fSpeed) {
-            sendCode("M106 S" + $fSpeed);
+        var fanTimeout;
+        function setFanSpeed(speed) {
+            clearTimeout(fanTimeout);
+            fanTimeout = setTimeout(function() {
+                sendCode("M106 S" + speed);
+            }, 1000);
+        }
+
+        var extruderTimeout;
+        function setExtruderTarget(temp) {
+            clearTimeout(extruderTimeout);
+            extruderTimeout = setTimeout(function() {
+                var value = pad(temp, 3);
+                sendCommand('{C:T0' + value + '}');
+            }, 1000);
+        }
+
+        var bedTimeout;
+        function setBedTarget(temp){ 
+            clearTimeout(bedTimeout);
+            bedTimeout = setTimeout(function() {
+                var value = pad(temp, 3);
+                sendCommand('{C:P' + value + '}');
+            }, 1000);
         }
 
         $('.homeIt').click(function() {
@@ -794,27 +837,112 @@
 
         });
 
+    </script>
+    <script>
+
+        function updateExtruderSliderValue(v) {
+            var done = updateSliderValue($('#extruderSlider'), $('#extruderHandle'), v, extruderUpdateTime);
+            if (done)
+                updateSliderHandlerColor($('#extruderHandle'), v, EXTRUDER_MAX);
+        }
+
+        function updateBedSliderValue(v) {
+            var done = updateSliderValue($('#bedSlider'), $('#bedHandle'), v, bedUpdateTime);
+            if (done)
+                updateSliderHandlerColor($('#bedHandle'), v, BED_MAX);
+        }
+
+        var extruderUpdateTime = null;
+        var bedUpdateTime = null;
+
+        const BED_MAX = 60;
+        const EXTRUDER_MAX = 210;
+
         $(function() {
+            var fh = $('#fanHandle');
             $("#fanSlider").slider({
                 orientation: 'vertical',
                 value: 0,
-                min: 0,
-                max: 255,
-                step: 25.5,
+                min: 0, max: 255, step: 25.5,
+                create: function(e, ui) {
+                    var v = $(this).slider("value");
+                    fh.text(displayPercent(v));
+                },
                 slide: function(event, ui) {
-                    var fanPercent = ui.value;
-                    setFan(ui.value);
-                    var fanMax = 255;
-                    fanPercent = (fanPercent / fanMax) * 100;
-                    if (fanPercent == '0') {
-                        fanPercent = "Off";
-                    } else {
-                        fanPercent = fanPercent + "%";
-                    }
-                    $("#fanAmount").html(fanPercent);
+                    var value = ui.value;
+                    setFanSpeed(value);
+                    fanPercent = (value / 255) * 100;
+                    fh.text(displayPercent(fanPercent));
+                }
+            });
+
+            var bh = $('#bedHandle');
+            $("#bedSlider").slider({
+                orientation: 'vertical',
+                value: 0,
+                min: 0, max: 100, step: 5,
+                create: function(e, ui) {
+                    var v = $(this).slider("value");
+                    bh.html(displayDegrees(v));
+                },
+                slide: function(e, ui) {
+                    bedUpdateTime = new Date().getTime();
+                    setBedTarget(ui.value);
+                    bh.html(displayDegrees(ui.value));
+                    updateSliderHandlerColor(bh, ui.value, BED_MAX);
+                }
+            });
+
+            var eh = $('#extruderHandle');
+            $("#extruderSlider").slider({
+                orientation: 'vertical',
+                value: 0,
+                min: 0, max: 255, step: 5,
+                create: function(e, ui) {
+                    var v = $(this).slider("value");
+                    eh.html(displayDegrees(v));
+                },
+                slide: function(e, ui) {
+                    extruderUpdateTime = new Date().getTime();
+                    setExtruderTarget(ui.value)
+                    eh.html(displayDegrees(ui.value));
+                    updateSliderHandlerColor(eh, ui.value, EXTRUDER_MAX);
                 }
             });
         });
+
+        function updateSliderValue(e, h, v, ut) {
+            if (new Date().getTime() - ut < 5000)
+                return false;
+
+            if (e.slider("instance") != undefined) {
+                e.slider("value", v);
+
+                h.html(displayDegrees(v));
+                return true;
+            } 
+            return false;
+        }
+
+        function updateSliderHandlerColor(h, v, m) {
+            if (v > m)
+                h.css('background-color', 'red');
+            else
+                h.css('background-color', '');
+        }
+
+        function displayPercent(v) {
+            if (v > 0)
+                return v + "%";
+            return "Off";
+        }
+
+        function displayDegrees(v) {
+            if (v > 0)
+                return v + "&deg;";
+            return "Off";
+        }
+        
     </script>
 </body>
 
