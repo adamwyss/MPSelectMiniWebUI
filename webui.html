@@ -19,6 +19,16 @@
     </div>
 
     <style>
+        .button-content-only {
+            padding:0;
+            border:none;
+            background:none;
+        }
+
+        .button-content-only:hover {
+            outline: none;
+        }
+
         .disabledbutton {
             pointer-events: none;
             opacity: 0.4;
@@ -110,8 +120,9 @@
             font-size: 10px;
         }
         
-        span.ui-slider-handle.ui-corner-all.ui-state-default {
-            background: #337ab7;
+        .file {
+            list-style-type: none;
+            cursor: pointer;
         }
         
         .sliderTrack {
@@ -382,6 +393,13 @@
                     </div>
                         </div>
 
+                        <div class="col-xs-12 controlBoxDisableForPrint">
+                            <div class="col-xs-12 controlBoxHeader"><i class="fa fa-hdd-o"></i> SD Card  <button class="button-content-only" style="float: right;" id="fileRefresh"><i class="fa fa-refresh"></i></button></div>
+                            <div class="col-xs-12" id="fileList">
+                                <i>Refresh to see files.</i>
+                            </div>
+                        </div>
+
                         <div class="clearfix"></div>
                     </div>
                 </div>
@@ -481,6 +499,101 @@
             });
         }
 
+        var connected = false;
+        function initWebSocket() {
+            url = window.location.hostname;
+
+            try {
+                ws = new WebSocket('ws://' + url + ':81');
+                console.log("WS.connecting");
+                ws.onopen = function(a) {
+                    console.log("WS.connected");
+                    connected = true;
+                }
+                ws.onmessage = function(a) {
+                    console.log("WS.message " + a.data);
+                    handleMessageStream(a.data);
+                }
+                ws.onclose = function() {
+                    console.log("WS.disconnected");
+                    connected = false;
+                }
+            }
+            catch(e) {
+                console.log("WS.error " + e);
+            }
+        }
+
+        var sdListing = false;
+        function handleMessageStream(messages) {
+            const lines = messages.split(/\n/g);
+            lines.forEach(function(line) {
+                if (line == '')
+                    return;
+
+                console.log('processing message: "' + line + '"');
+
+                const token13 = line.substring(0, 13);
+                if (sdListing && token13 != 'End file list') {
+                    const name = line;
+                    itemHTML = '<li class="file">'; // TODO: M30 will delete files
+                    itemHTML += '<i class="fa fa-file-o"></i> <span onclick="printFromCard(\'' + name + '\')">' + name + '</span>';
+                    itemHTML += '</li>';
+                    $('#fileList').append(itemHTML);
+                }
+
+                if (token13 == 'End file list') {
+                    sdListing = false;
+                    return;
+                }
+
+                const token15 = line.substring(0, 15);
+                if (token15 == 'Begin file list') {
+                    sdListing = true;
+                    $('#fileList').html('');
+                    return;
+                }
+
+                const token4 = line.substring(0, 4);
+                if (token4 == 'echo') {
+                    const text = line.substring(5);
+                    displayConsole(text);
+                    return;
+                }
+
+                if (token4 == 'File') { // File opened, File selected
+                    displayConsole(line);
+                    return;
+                }
+
+                if (token4 == 'Done') { // Done printing file
+                    displayConsole(line);
+                    return;
+                }
+
+            });
+        }
+        function printFromCard(filename) {
+            sendCode('M23 ' + filename, null, function() {
+                sendCode('M24');
+            });
+        }
+        var cardInit = false;
+        $(document).ready(function() {
+            $('#fileRefresh').click(function(e) {
+                if (cardInit) {
+                    sendCode('M20');
+        }
+                else {
+                    cardInit = true;
+                    sendCode('M21', null, function() {
+                        sendCode('M20');
+                    });
+                }                   
+            });
+        });
+
+
         function updateState() {
             var current = new Date().getTime();
             var invalidState = $forceStateState || !$lastStateFetch || (current - $lastStateFetch >= 5000);
@@ -509,6 +622,10 @@
                     if (c == 'I') {
                         updatePrintingStats(-1);
                         enableControls(true)
+
+                        if (connected == false) {
+                            initWebSocket();
+                        }
                     } else if (c == 'P') {
                         enableControls(false);
                         var percentComplete = data.match(/\d+/g)[4];
