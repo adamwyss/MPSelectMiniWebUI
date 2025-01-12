@@ -358,39 +358,39 @@
                             <div class="col-xs-12 controlBoxHeader"><i class="fa fa-area-chart"></i> Monitor</div>
                             <div class="col-xs-12">
 
-                        <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
-                            <strong>Extruder</strong> Temp: <strong><span id="rde" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdeTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div id="tempChart" style="height: 150px;"></div>
-                        <div class="clearfix"></div>
-                        <div class="col-xs-12" style="text-align: center;">
-                            <span class="">
-                        <input class="form-control" type="text" id="wre" placeholder="Set Extruder Temp" style="max-width: 200px; display: inline-block;"/>
-                        <button class="btn btn-success" id="sete" style="height: 34px;"><i class="fa fa-check"></i></button>
-                        <button class="btn btn-danger" id="clre" style="height: 34px;"><i class="fa fa-times"></i></button>
-                      </span>
-                        </div>
-                        <div class="clearfix"></div>
+                                <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
+                                    <strong>Extruder</strong> Temp: <strong><span id="rde" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdeTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
+                                </div>
+                                <div class="clearfix"></div>
+                                        <div id="extruderChart" style="height: 150px;"></div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-12" style="text-align: center;">
+                                    <span class="">
+                                        <input class="form-control" type="text" id="wre" placeholder="Set Extruder Temp" style="max-width: 200px; display: inline-block;"/>
+                                        <button class="btn btn-success" id="sete" style="height: 34px;"><i class="fa fa-check"></i></button>
+                                        <button class="btn btn-danger" id="clre" style="height: 34px;"><i class="fa fa-times"></i></button>
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
 
-                        <hr>
+                                <hr>
 
-                        <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
-                            <strong>Build Platform</strong> Temp: <strong><span id="rdp" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdpTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div id="tempChart2" style="height: 150px;"></div>
-                        <div class="clearfix"></div>
-                        <div class="col-xs-12" style="text-align: center;">
-                            <span class="">
-                        <input class="form-control" type="text" id="wrp" placeholder="Set Platform Temp" style="max-width: 200px; display: inline-block;"/>
-                        <button class="btn btn-success" id="setp" style="height: 34px;"><i class="fa fa-check"></i></button>
-                        <button class="btn btn-danger" id="clrp" style="height: 34px;"><i class="fa fa-times"></i></button>
-                      </span>
-                        </div>
-                        <div class="clearfix"></div>
+                                <div class="col-xs-12" style="text-align: center; margin-bottom: 10px;">
+                                    <strong>Build Platform</strong> Temp: <strong><span id="rdp" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong> Target: <strong><span id="rdpTarget" style="border: 3px solid #b3b3b3; padding: 6px; border-radius: 2px; margin-right: 10px;">N/A</span></strong>
+                                </div>
+                                <div class="clearfix"></div>
+                                        <div id="bedChart" style="height: 150px;"></div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-12" style="text-align: center;">
+                                    <span class="">
+                                        <input class="form-control" type="text" id="wrp" placeholder="Set Platform Temp" style="max-width: 200px; display: inline-block;"/>
+                                        <button class="btn btn-success" id="setp" style="height: 34px;"><i class="fa fa-check"></i></button>
+                                        <button class="btn btn-danger" id="clrp" style="height: 34px;"><i class="fa fa-times"></i></button>
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
 
-                    </div>
+                            </div>
                         </div>
 
                         <div class="col-xs-12 controlBoxDisableForPrint">
@@ -525,6 +525,7 @@
         }
 
         var sdListing = false;
+
         function handleMessageStream(messages) {
             const lines = messages.split(/\n/g);
             lines.forEach(function(line) {
@@ -573,11 +574,13 @@
 
             });
         }
+        
         function printFromCard(filename) {
             sendCode('M23 ' + filename, null, function() {
                 sendCode('M24');
             });
         }
+
         var cardInit = false;
         $(document).ready(function() {
             $('#fileRefresh').click(function(e) {
@@ -592,7 +595,6 @@
                 }                   
             });
         });
-
 
         function updateState() {
             var current = new Date().getTime();
@@ -857,46 +859,19 @@
 
         $(document).ready(function() {
             $("#dropzone").appendTo("#newDropzone").show();
-            $("#tempChart").appendTo("#newTempChart").show();
         });
 
-        $(document).ready(function() {
-            $(function() {
-                var data = [];
-                var data2 = [];
-                var totalPoints = 300;
+    </script>
+    <script>
 
-                function getData() {
-                    data = data.slice(1);
-                    while (data.length < totalPoints) {
-                        var x = new Date($.now());
-                        var y = $extruderTemp;
-                        data.push(y);
-                    }
-                    var res = [];
-                    for (var i = 0; i < data.length; ++i) {
-                        res.push([i, data[i]]);
-                    }
-                    return res;
-                }
+        const totalPoints = 300;
+        var extruderPlot = null;
+        var bedPlot = null;
+        var extruderData = [];
+        var bedData = [];
 
-                function getData2() {
-                    data2 = data2.slice(1);
-                    while (data2.length < totalPoints) {
-                        var x = new Date($.now());
-                        var y = $bedTemp;
-                        data2.push(y);
-                    }
-                    var res2 = [];
-                    for (var i = 0; i < data2.length; ++i) {
-                        res2.push([i, data2[i]]);
-                    }
-                    return res2;
-                }
-
-                // Set up the control widget
-                var updateInterval = 500;
-                var plot = $.plot("#tempChart", [getData()], {
+        $(function() {
+            extruderPlot = $.plot("#extruderChart", [appendLatestExtruderDataPoint()], {
                     series: {
                         shadowSize: 0 // Drawing is faster without shadows
                     },
@@ -916,7 +891,7 @@
                     }
                 });
 
-                var plot2 = $.plot("#tempChart2", [getData2()], {
+            bedPlot = $.plot("#bedChart", [appendLatestBedDataPoint()], {
                     series: {
                         shadowSize: 0 // Drawing is faster without shadows
                     },
@@ -937,22 +912,40 @@
 
                 });
 
-                var tempChart = $("#tempChart");
-                var tempChart2 = $("#tempChart2");
-
-                function update() {
-                    plot.setData([getData()]);
-                    plot2.setData([getData2()]);
-                    // Since the axes don't change, we don't need to call plot.setupGrid()
-                    plot.draw();
-                    plot2.draw();
-                    setTimeout(update, updateInterval);
-                }
-
-                update();
-            });
-
+            update();
         });
+
+        function appendLatestExtruderDataPoint() {
+            extruderData = extruderData.slice(1);
+            while (extruderData.length < totalPoints) {
+                extruderData.push($extruderTemp);
+            }
+            return prepare(extruderData);
+        }
+
+        function appendLatestBedDataPoint() {
+            bedData = bedData.slice(1);
+            while (bedData.length < totalPoints) {
+                bedData.push($bedTemp);
+            }
+            return prepare(bedData);
+        }
+
+        function prepare(data) {
+            var res = [];
+            for (var i = 0; i < data.length; i++) {
+                res.push([i, data[i]]);
+            }
+            return res;
+        }
+
+        function update() {
+            extruderPlot.setData([appendLatestExtruderDataPoint()]);
+            bedPlot.setData([appendLatestBedDataPoint()]);
+            extruderPlot.draw();
+            bedPlot.draw();
+            setTimeout(update, 500);
+                }
 
     </script>
     <script>
